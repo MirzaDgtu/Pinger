@@ -42,6 +42,8 @@ type
     memoLog: TMemo;
     btnAutoPingDevices: TToolButton;
     actAutoPingDevices: TAction;
+    actSaveLog: TAction;
+    btnSaveLog: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure actAddDeviceExecute(Sender: TObject);
     procedure actGetDeviceAdressExecute(Sender: TObject);
@@ -54,6 +56,7 @@ type
     procedure lvDevicesSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
     procedure actAutoPingDevicesExecute(Sender: TObject);
+    procedure actSaveLogExecute(Sender: TObject);
   private
     FfileIni: TIniFile;
     FfileIniPath: string;
@@ -61,8 +64,8 @@ type
     procedure WriteDevice(Name, IP_Adress: string);
     function GetDevice(Section, Name: string): String;
     procedure AddDeviceToLv(caption, subCaption: string);
-    procedure setInfoToSB(countDevices: integer);
-    procedure pingToHost(host: string);
+    procedure setInfoToSB(countDevices, countDevicesOffline: integer);
+    procedure pingToHost(item: TListItem);
 
 
     procedure SetfileIni(const Value: TIniFile);
@@ -100,12 +103,26 @@ begin
 end;
 
 procedure TfMain.actAutoPingDevicesExecute(Sender: TObject);
+var
+  i, cntDevicesOffline: integer;
 begin
+  cntDevicesOffline := 0;
   if lvDevices.Items.Count > 0 then
     try
-
+      for I := 0 to lvDevices.Items.Count - 1  do
+        try
+           pingToHost(lvDevices.Items.Item[i]);
+        except
+          memoLog.Lines.Add('Ошибка проверки сети до устройства - ' + lvDevices.Items.Item[i].Caption);
+        end;
     finally
+       actSaveLogExecute(nil);
 
+       for I := 0 to lvDevices.Items.Count - 1 do 
+        if lvDevices.Items.Item[i].ImageIndex = 22 then
+            inc(cntDevicesOffline);
+
+       setInfoToSB(lvDevices.Items.Count, cntDevicesOffline); 
     end;
 end;
 
@@ -131,7 +148,8 @@ end;
 
 procedure TfMain.actPintToDeviceExecute(Sender: TObject);
 begin
-  pingToHost(lvDevices.Selected.SubItems[0]);
+  if lvDevices.Selected <> nil then
+    pingToHost(lvDevices.Selected);
 end;
 
 procedure TfMain.actRefreshLvExecute(Sender: TObject);
@@ -161,9 +179,18 @@ begin
     lvDevices.SortType := stBoth;
     lvDevices.SortType := stNone;
     lvDevices.Items.EndUpdate;
-    setInfoToSB(lvDevices.Items.Count);
+    setInfoToSB(lvDevices.Items.Count, 0);
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TfMain.actSaveLogExecute(Sender: TObject);
+begin
+  if not memoLog.Lines.Text.IsEmpty then
+    Begin
+      memoLog.Lines.SaveToFile(ExtractFilePath(GetModuleName(0)) + 'Log\log_' + FormatDateTime('ddMMyyyy-hhmm', Now()) + '.log');
+      memoLog.Lines.Add('Лог успешно сохранен');
+    End;
 end;
 
 procedure TfMain.AddDeviceToLv(caption, subCaption: string);
@@ -222,15 +249,16 @@ begin
    edIpAdress.Text := Item.SubItems[0];
 end;
 
-procedure TfMain.pingToHost(host: string);
+procedure TfMain.pingToHost(item: TListItem);
 var
   timer: TStopWatch;
-  i: integer;
+  i, cntSuccessPing: integer;
 begin
-  if lvDevices.Selected <> nil then
+  cntSuccessPing := 0;
+
   try
-    memoLog.Lines.Add('Проверка связи с хостом - ' + host);
-    IdClient.Host := host;
+    memoLog.Lines.Add('Проверка связи с хостом - ' + item.SubItems[0]);
+    IdClient.Host := item.SubItems[0];
 
     for i := 0 to 3 do
       Begin
@@ -238,17 +266,31 @@ begin
         IdClient.Ping();
         timer.Stop;
 
-        memoLog.Lines.Add(Format('Пакет - %d, Время выполнения - %d мс', [i+1, timer.Elapsed.Milliseconds]));
-        memoLog.Lines.Add('IdCLient timeout - ' + IdClient.ReplyStatus.MsRoundTripTime.ToString);
+       // memoLog.Lines.Add(Format('Пакет - %d, Время выполнения - %d мс', [i+1, timer.Elapsed.Milliseconds]));
+         memoLog.Lines.Add(Format('Пакет - %d, Время выполнения - %d мс', [i+1, IdClient.ReplyStatus.MsRoundTripTime]));
 
+        if //(IdClient.ReplyStatus.MsRoundTripTime > 0) AND
+           (IdClient.ReplyStatus.MsRoundTripTime < 999) then
+          Inc(cntSuccessPing);
 
       End;
+
+      if cntSuccessPing = 4 then
+        item.ImageIndex := 21
+      else if (cntSuccessPing >= 2) and (cntSuccessPing < 4 )  then
+              item.ImageIndex := 25
+      else if cntSuccessPing <= 0 then           
+        item.ImageIndex := 22;        
+        
+       memoLog.Lines.Add(EmptyStr);
+
   except
     on ex: Exception do
       Begin
         memoLog.Lines.Add('Произошла ошибка проверки связи!');
         memoLog.Lines.Add('Сообщение - ' + ex.Message);
         memoLog.Lines.Add('Проверьте корректность адреса');
+        memoLog.Lines.Add(EmptyStr);
       End;
   end;
 end;
@@ -267,6 +309,12 @@ begin
           IL.Draw(sbBottom.Canvas, Rect.Left, Rect.Top, 18);
         End;
 
+      if Panel = sbBottom.Panels[1] then
+        Begin
+          Font.Color := clRed;
+          IL.Draw(sbBottom.Canvas, Rect.Left, Rect.Top, 22);
+        End;
+
       TextOut(Rect.Left + 17, Rect.Top, Panel.Text);
     End;
 
@@ -282,9 +330,10 @@ begin
   FfileIniPath := Value;
 end;
 
-procedure TfMain.setInfoToSB(countDevices: integer);
+procedure TfMain.setInfoToSB(countDevices, countDevicesOffline: integer);
 begin
   sbBottom.Panels[0].Text :=  Format('Устройств - %d', [countDevices]);
+  sbBottom.Panels[1].Text :=  Format('Не в сети - %d', [countDevicesOffline]);
 end;
 
 procedure TfMain.edNameDeviceChange(Sender: TObject);
