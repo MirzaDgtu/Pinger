@@ -11,6 +11,7 @@ object fMain: TfMain
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -31,7 +32,7 @@ object fMain: TfMain
     Align = alTop
     Caption = '&'#1044#1077#1081#1089#1090#1074#1080#1103
     TabOrder = 0
-    ExplicitWidth = 336
+    Visible = False
     object Label1: TLabel
       Left = 16
       Top = 27
@@ -161,6 +162,8 @@ object fMain: TfMain
     Width = 329
     Height = 23
     Images = IL
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 2
     object btnAutoPingDevices: TToolButton
       Left = 0
@@ -207,9 +210,6 @@ object fMain: TfMain
         Width = 50
       end>
     OnDrawPanel = sbBottomDrawPanel
-    ExplicitLeft = 176
-    ExplicitTop = 224
-    ExplicitWidth = 0
   end
   object gbxLog: TGroupBox
     Left = 0
@@ -225,7 +225,6 @@ object fMain: TfMain
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 4
-    ExplicitTop = 367
     object memoLog: TMemo
       Left = 2
       Top = 15
@@ -1177,21 +1176,25 @@ object fMain: TfMain
     Top = 216
     object actAddDevice: TAction
       Caption = '&'#1044#1086#1073'/'#1048#1079#1084
+      Hint = #1044#1086#1073#1072#1074#1080#1090#1100' '#1091#1089#1090#1088#1086#1081#1089#1090#1074#1086
       ImageIndex = 0
       OnExecute = actAddDeviceExecute
     end
     object actGetDeviceAdress: TAction
       Caption = '&'#1055#1086#1083#1091#1095#1080#1090#1100
+      Hint = #1055#1086#1083#1091#1095#1080#1090#1100' IP '#1091#1089#1090#1088#1086#1081#1089#1090#1074#1072
       ImageIndex = 2
       OnExecute = actGetDeviceAdressExecute
     end
     object actRefreshLv: TAction
       Caption = '&'#1054#1073#1085#1086#1074#1080#1090#1100
+      Hint = #1054#1073#1085#1086#1074#1080#1090#1100' '#1089#1087#1080#1089#1086#1082' '#1091#1089#1090#1088#1086#1081#1089#1090#1074
       ImageIndex = 9
       OnExecute = actRefreshLvExecute
     end
     object actDeleteDevice: TAction
       Caption = '&'#1059#1076#1072#1083#1080#1090#1100
+      Hint = #1055#1080#1085#1075' '#1074#1099#1073#1088#1072#1085#1085#1086#1075#1086' '#1091#1089#1090#1088#1086#1081#1089#1090#1074#1072
       ImageIndex = 7
       OnExecute = actDeleteDeviceExecute
     end
@@ -1202,11 +1205,13 @@ object fMain: TfMain
     end
     object actAutoPingDevices: TAction
       Caption = '&'#1040#1074#1090#1086#1055#1080#1085#1075
+      Hint = #1055#1080#1085#1075' '#1087#1086' '#1074#1089#1077#1084' '#1091#1089#1090#1088#1086#1081#1089#1090#1074#1072#1084
       ImageIndex = 23
       OnExecute = actAutoPingDevicesExecute
     end
     object actSaveLog: TAction
       Caption = '&'#1057#1086#1093#1088#1072#1085#1080#1090#1100
+      Hint = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1083#1086#1075
       ImageIndex = 24
       OnExecute = actSaveLogExecute
     end
@@ -1217,5 +1222,11 @@ object fMain: TfMain
     IPVersion = Id_IPv4
     Left = 232
     Top = 272
+  end
+  object timerStart: TTimer
+    Enabled = False
+    OnTimer = timerStartTimer
+    Left = 232
+    Top = 328
   end
 end

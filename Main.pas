@@ -44,6 +44,7 @@ type
     actAutoPingDevices: TAction;
     actSaveLog: TAction;
     btnSaveLog: TToolButton;
+    timerStart: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure actAddDeviceExecute(Sender: TObject);
     procedure actGetDeviceAdressExecute(Sender: TObject);
@@ -57,9 +58,11 @@ type
       Selected: Boolean);
     procedure actAutoPingDevicesExecute(Sender: TObject);
     procedure actSaveLogExecute(Sender: TObject);
+    procedure timerStartTimer(Sender: TObject);
   private
     FfileIni: TIniFile;
     FfileIniPath: string;
+    FsecToStart: smallint;
     { Private declarations }
     procedure WriteDevice(Name, IP_Adress: string);
     function GetDevice(Section, Name: string): String;
@@ -74,10 +77,12 @@ type
     function isEmptyText(value: string): Boolean;
     function getNameDevice(value: string): String;
     function getAdressDevice(value: string): String;
+    procedure SetsecToStart(const Value: smallint);
 
   protected
     property fileIni: TIniFile read FfileIni write SetfileIni;
     property fileIniPath: string read FfileIniPath write SetfileIniPath;
+    property secToStart: smallint read FsecToStart write SetsecToStart;
   public
     { Public declarations }
   end;
@@ -213,9 +218,19 @@ end;
 
 procedure TfMain.FormCreate(Sender: TObject);
 begin
+
   SetfileIniPath(ExtractFilePath(GetModuleName(0)) + SFileIniName);
   fileIni := TIniFile.Create(fileIniPath);
   actRefreshLvExecute(nil);
+
+  with fMain  do
+  Begin
+    SetWindowPos(Handle, HWND_TOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE or SWP_NOMOVE or SWP_NOSIZE);
+  End;
+
+  SetsecToStart(5);
+  timerStart.Enabled := True;
+
 end;
 
 
@@ -334,6 +349,24 @@ procedure TfMain.setInfoToSB(countDevices, countDevicesOffline: integer);
 begin
   sbBottom.Panels[0].Text :=  Format('Устройств - %d', [countDevices]);
   sbBottom.Panels[1].Text :=  Format('Не в сети - %d', [countDevicesOffline]);
+end;
+
+procedure TfMain.SetsecToStart(const Value: smallint);
+begin
+  FsecToStart := Value;
+end;
+
+procedure TfMain.timerStartTimer(Sender: TObject);
+begin
+  secToStart := secToStart - 1;
+  Self.Caption := ' Before the start of Pinger - ' + secToStart.ToString;
+
+  if secToStart = 0 then
+    Begin
+      timerStart.Enabled := false;
+
+      actAutoPingDevicesExecute(nil);
+    End;
 end;
 
 procedure TfMain.edNameDeviceChange(Sender: TObject);

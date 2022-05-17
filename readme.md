@@ -7,3 +7,5 @@
 Для получения адреса некоторого устройства необходимо заполнить поле Наименование и нажать кнопку получить
 ![image](https://user-images.githubusercontent.com/40886779/166620664-b194371b-46ec-4bfc-81f7-5aa389daf571.png)
 ![image](https://user-images.githubusercontent.com/40886779/166621182-56c5721c-309a-40f1-9771-860c36948037.png)
+
+
