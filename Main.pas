@@ -60,7 +60,7 @@ type
     procedure actSaveLogExecute(Sender: TObject);
     procedure timerStartTimer(Sender: TObject);
   private
-    FfileIni: TIniFile;
+    FfileIni: TMemIniFile;
     FfileIniPath: string;
     FsecToStart: smallint;
     { Private declarations }
@@ -71,7 +71,7 @@ type
     procedure pingToHost(item: TListItem);
 
 
-    procedure SetfileIni(const Value: TIniFile);
+    procedure SetfileIni(const Value: TMemIniFile);
     procedure SetfileIniPath(const Value: string);
 
     function isEmptyText(value: string): Boolean;
@@ -80,7 +80,7 @@ type
     procedure SetsecToStart(const Value: smallint);
 
   protected
-    property fileIni: TIniFile read FfileIni write SetfileIni;
+    property fileIni: TMemIniFile read FfileIni write SetfileIni;
     property fileIniPath: string read FfileIniPath write SetfileIniPath;
     property secToStart: smallint read FsecToStart write SetsecToStart;
   public
@@ -218,9 +218,8 @@ end;
 
 procedure TfMain.FormCreate(Sender: TObject);
 begin
-
   SetfileIniPath(ExtractFilePath(GetModuleName(0)) + SFileIniName);
-  fileIni := TIniFile.Create(fileIniPath);
+  fileIni := TMemIniFile.Create(fileIniPath, TEncoding.UTF8);
   actRefreshLvExecute(nil);
 
   with fMain  do
@@ -230,7 +229,6 @@ begin
 
   SetsecToStart(5);
   timerStart.Enabled := True;
-
 end;
 
 
@@ -335,7 +333,7 @@ begin
 
 end;
 
-procedure TfMain.SetfileIni(const Value: TIniFile);
+procedure TfMain.SetfileIni(const Value: TMemIniFile);
 begin
   FfileIni := Value;
 end;

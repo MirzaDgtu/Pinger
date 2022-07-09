@@ -2,8 +2,8 @@ object fMain: TfMain
   Left = 0
   Top = 0
   Caption = 'Pinger'
-  ClientHeight = 510
-  ClientWidth = 329
+  ClientHeight = 615
+  ClientWidth = 452
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,22 +17,24 @@ object fMain: TfMain
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 361
-    Width = 329
+    Top = 517
+    Width = 452
     Height = 3
     Cursor = crVSplit
     Align = alTop
+    ExplicitTop = 361
     ExplicitWidth = 130
   end
   object grDeviceParametr: TGroupBox
     Left = 0
     Top = 0
-    Width = 329
+    Width = 452
     Height = 81
     Align = alTop
     Caption = '&'#1044#1077#1081#1089#1090#1074#1080#1103
     TabOrder = 0
     Visible = False
+    ExplicitWidth = 329
     object Label1: TLabel
       Left = 16
       Top = 27
@@ -124,8 +126,8 @@ object fMain: TfMain
   object lvDevices: TListView
     Left = 0
     Top = 104
-    Width = 329
-    Height = 257
+    Width = 452
+    Height = 413
     Align = alTop
     Columns = <
       item
@@ -159,12 +161,13 @@ object fMain: TfMain
   object TB: TToolBar
     Left = 0
     Top = 81
-    Width = 329
+    Width = 452
     Height = 23
     Images = IL
     ParentShowHint = False
     ShowHint = True
     TabOrder = 2
+    ExplicitWidth = 329
     object btnAutoPingDevices: TToolButton
       Left = 0
       Top = 0
@@ -193,8 +196,8 @@ object fMain: TfMain
   end
   object sbBottom: TStatusBar
     Left = 0
-    Top = 491
-    Width = 329
+    Top = 596
+    Width = 452
     Height = 19
     Panels = <
       item
@@ -210,12 +213,14 @@ object fMain: TfMain
         Width = 50
       end>
     OnDrawPanel = sbBottomDrawPanel
+    ExplicitTop = 491
+    ExplicitWidth = 329
   end
   object gbxLog: TGroupBox
     Left = 0
-    Top = 364
-    Width = 329
-    Height = 127
+    Top = 520
+    Width = 452
+    Height = 76
     Align = alClient
     Caption = '&'#1051#1086#1075' '#1089#1086#1073#1099#1090#1080#1081
     Font.Charset = DEFAULT_CHARSET
@@ -225,14 +230,18 @@ object fMain: TfMain
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 4
+    ExplicitTop = 364
+    ExplicitWidth = 329
+    ExplicitHeight = 127
     object memoLog: TMemo
       Left = 2
       Top = 15
-      Width = 325
-      Height = 110
+      Width = 448
+      Height = 59
       Align = alClient
       ScrollBars = ssBoth
       TabOrder = 0
+      ExplicitHeight = 165
     end
   end
   object IL: TImageList
